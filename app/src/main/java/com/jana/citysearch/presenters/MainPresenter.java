@@ -13,20 +13,29 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.jana.citysearch.R;
+import com.jana.citysearch.adapters.CityAdapter;
 import com.jana.citysearch.model.MainPresenterParameter;
+import com.jana.citysearch.repositories.CityRepository;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
-import java.util.IllegalFormatCodePointException;
+import rx.schedulers.Schedulers;
 
 @EBean
 public class MainPresenter {
 
     private DrawerLayout drawerLayout;
 
+    @Bean
+    public CityRepository cityRepository;
+
+    @Bean
+    public CityAdapter cityAdapter;
+
     @RootContext
-    public AppCompatActivity parentActivity;
+    public AppCompatActivity activity;
 
     public void initializeView(MainPresenterParameter presenterParameter)
             throws IllegalArgumentException {
@@ -38,6 +47,7 @@ public class MainPresenter {
         RecyclerView recyclerView = presenterParameter.getRecyclerView();
         DrawerLayout drawerLayout = presenterParameter.getDrawerLayout();
         NavigationView navigationView = presenterParameter.getNavigationView();
+
         this.drawerLayout = drawerLayout;
 
         if (toolbar == null)
@@ -53,27 +63,46 @@ public class MainPresenter {
         if (navigationView == null)
             throw new IllegalArgumentException("NavigationView is null");
 
-        parentActivity.setSupportActionBar(toolbar);
+        activity.setSupportActionBar(toolbar);
         collapsingToolbarLayout.setTitle(citySearchText);
 
-        final ActionBar actionBar = parentActivity.getSupportActionBar();
+        final ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(navigationMenuIcon);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if (navigationView != null)
-            setupDrawerContent(navigationView);
+        setupDrawerContent(navigationView);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(parentActivity);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-//        recyclerView.setAdapter(cityAdapter);
+        recyclerView.setAdapter(cityAdapter);
     }
 
     public void openDrawer() {
         drawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    public void cityNameChanged(String text) {
+        cityAdapter.clearList();
+        cityRepository
+            .searchAsync(text)
+            .subscribeOn(Schedulers.newThread())
+            .subscribe(city -> {
+                activity.runOnUiThread(() -> cityAdapter.add(city));
+            });
+    }
+
+    public void displayAllCities() {
+        cityAdapter.clearList();
+        cityRepository
+            .searchAsync("")
+			.subscribeOn(Schedulers.newThread())
+            .subscribe(city -> {
+                activity.runOnUiThread(() -> cityAdapter.add(city));
+            });
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
