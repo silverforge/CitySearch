@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="all">
+        <item
+            android:id="@+id/drawer_cities"
+            android:icon="@drawable/abc_spinner_textfield_background_material"
+            android:title="@string/cities" />
+    </group>
+</menu>

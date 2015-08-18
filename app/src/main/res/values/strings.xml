@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CitySearch</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="cities">Cities</string>
+    <string name="citysearch">City search</string>
+    <string name="cityname">City name</string>
+</resources>
