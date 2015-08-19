@@ -57,4 +57,13 @@ public class CityAdapter
         cityList.add(city);
         notifyDataSetChanged();
     }
+
+    public void addRange(List<City> cities) {
+        cityList.addAll(cities);
+        notifyDataSetChanged();
+    }
+
+    public List<City> getList() {
+        return cityList;
+    }
 }

@@ -16,17 +16,21 @@ import android.widget.Toast;
 
 import com.jana.citysearch.R;
 import com.jana.citysearch.adapters.CityAdapter;
+import com.jana.citysearch.model.City;
 import com.jana.citysearch.presenters.MainPresenter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DrawableRes;
 import org.androidannotations.annotations.res.StringRes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -36,6 +40,8 @@ import rx.android.widget.WidgetObservable;
 @OptionsMenu(R.menu.menu_main)
 public class MainActivity
         extends AppCompatActivity {
+
+    // region Dependencies
 
     @StringRes(R.string.citysearch)
     public String citySearchText;
@@ -69,12 +75,16 @@ public class MainActivity
     @Bean
     public CityAdapter cityAdapter;
 
-    
+    // endregion
+
+    @InstanceState
+    public ArrayList<City> lastCities;
+
     @AfterViews
     public void mainActivityAfterViews() {
         initialize();
         mainPresenter.attachView(this);
-        mainPresenter.displayAllCities();
+        mainPresenter.displayCities(lastCities);
 
         WidgetObservable.text(cityName, false)
             .sample(TimeUnit.SECONDS.toSeconds(2), TimeUnit.SECONDS)
@@ -86,9 +96,9 @@ public class MainActivity
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mainPresenter.detachView();
         mainPresenter = null;
+        super.onDestroy();
     }
 
     @OptionsItem(android.R.id.home)
