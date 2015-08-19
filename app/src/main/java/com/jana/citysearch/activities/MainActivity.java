@@ -80,6 +80,9 @@ public class MainActivity
     @InstanceState
     public ArrayList<City> lastCities;
 
+    @InstanceState
+    public String lastText;
+
     @AfterViews
     public void mainActivityAfterViews() {
         initialize();
@@ -87,11 +90,17 @@ public class MainActivity
         mainPresenter.displayCities(lastCities);
 
         WidgetObservable.text(cityName, false)
-            .sample(TimeUnit.SECONDS.toSeconds(2), TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
+            .sample(TimeUnit.SECONDS.toSeconds(2), TimeUnit.SECONDS)
+            .distinctUntilChanged()
             .subscribe(textChangeEvent -> {
                 mainPresenter.cityNameChanged(textChangeEvent.text().toString());
             });
+    }
+
+    @OptionsItem(android.R.id.home)
+    public void homePressed() {
+        openDrawer();
     }
 
     @Override
@@ -99,11 +108,6 @@ public class MainActivity
         mainPresenter.detachView();
         mainPresenter = null;
         super.onDestroy();
-    }
-
-    @OptionsItem(android.R.id.home)
-    public void homePressed() {
-        openDrawer();
     }
 
     // region Private zone (I wish it were at partial class)
