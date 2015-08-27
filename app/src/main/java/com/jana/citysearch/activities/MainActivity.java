@@ -77,17 +77,11 @@ public class MainActivity
 
     // endregion
 
-    @InstanceState
-    public ArrayList<City> lastCities;
-
-    @InstanceState
-    public String lastText;
-
     @AfterViews
     public void mainActivityAfterViews() {
         initialize();
         mainPresenter.attachView(this);
-        mainPresenter.displayCities(lastCities);
+        mainPresenter.displayCities();
 
         WidgetObservable.text(cityName, false)
             .observeOn(AndroidSchedulers.mainThread())

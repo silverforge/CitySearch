@@ -1,6 +1,5 @@
 package com.jana.citysearch.presenters;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.jana.citysearch.activities.MainActivity;
@@ -24,7 +23,9 @@ public class MainPresenter {
 
     private MainActivity mainActivity;
     private CityAdapter cityAdapter;
+
     private String lastText;
+    private ArrayList<City> lastCities;
 
     @Bean
     public CityRepository cityRepository;
@@ -32,10 +33,10 @@ public class MainPresenter {
     public void attachView(MainActivity view) {
         mainActivity = view;
         cityAdapter = mainActivity.cityAdapter;
-        lastText = mainActivity.lastText;
     }
 
     public void detachView() {
+        cityAdapter = null;
         mainActivity = null;
     }
 
@@ -57,11 +58,11 @@ public class MainPresenter {
             });
     }
 
-    public void displayCities(@Nullable List<City> cities) {
+    public void displayCities() {
         clearList();
 
-        if (cities != null) {
-            restoreState(cities);
+        if (lastCities != null) {
+            restoreState(lastCities);
             return;
         }
 
@@ -82,7 +83,7 @@ public class MainPresenter {
 
     @UiThread
     protected void saveLastState() {
-        mainActivity.lastCities = new ArrayList<>(cityAdapter.getList());
+        lastCities = new ArrayList<>(cityAdapter.getList());
     }
 
     @UiThread
